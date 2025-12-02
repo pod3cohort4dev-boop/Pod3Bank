@@ -23,20 +23,20 @@ module "eks-deployment" {
   create_subnet     = var.create_subnet
   create_elastic_ip = var.create_elastic_ip
 
-  desired_size   = var.desired_size
-  max_size       = var.max_size
-  min_size       = var.min_size
-  instance_types = var.instance_types
-  capacity_type  = var.capacity_type
+  desired_size       = var.desired_size
+  max_size           = var.max_size
+  min_size           = var.min_size
+  instance_types     = var.instance_types
+  capacity_type      = var.capacity_type
 
   public_subnet_ids  = module.vpc-deployment.public_subnet_ids
   private_subnet_ids = module.vpc-deployment.private_subnet_ids
 
-  cluster_name    = var.cluster_name
-  repository_name = var.repository_name
+  cluster_name       = var.cluster_name
+  repository_name    = var.repository_name
 
-  domain_name = var.domain_name
-  email       = var.email
+  domain_name        = var.domain_name
+  email              = var.email
 }
 
 ##############################################
@@ -45,9 +45,11 @@ module "eks-deployment" {
 module "route53-deployment" {
   source = "./module-dns"
 
-  environment         = var.environment
-  domain_name         = var.domain_name
-  nginx_lb_hostname   = module.eks-deployment.nginx_ingress_load_balancer_hostname
+  environment       = var.environment
+  domain_name       = var.domain_name
+
+  # IMPORTANT: FIXED MODULE REFERENCE
+  nginx_lb_hostname = module.eks_deployment.nginx_ingress_load_balancer_hostname
 }
 
 ##############################################
