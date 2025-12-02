@@ -43,3 +43,4 @@ resource "aws_route53_record" "argocd" {
   ttl     = 300
   records = [module.eks-deployment.nginx_ingress_load_balancer_hostname]
 }
+
