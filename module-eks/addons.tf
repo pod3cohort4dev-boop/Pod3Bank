@@ -1,5 +1,5 @@
 ############################################
-# EKS auth for Kubernetes / Helm providers
+# EKS data sources (auth + endpoint)
 ############################################
 
 data "aws_eks_cluster" "eks" {
@@ -10,11 +10,19 @@ data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.eks.name
 }
 
+############################################
+# Kubernetes Provider
+############################################
+
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks.token
 }
+
+############################################
+# Helm Provider
+############################################
 
 provider "helm" {
   kubernetes = {
@@ -25,40 +33,34 @@ provider "helm" {
 }
 
 ############################################
-# Adopt Existing NGINX Ingress Release
+# IMPORTANT: Prevent Terraform from reinstalling ingress
 ############################################
+
 resource "helm_release" "nginx_ingress" {
-  name             = "nginx-ingress"
-  namespace        = "ingress-nginx"
-  create_namespace = true
+  name      = "nginx-ingress"
+  namespace = "ingress-nginx"
 
-  repository       = "https://kubernetes.github.io/ingress-nginx"
-  chart            = "ingress-nginx"
-  version          = "4.12.0"
+  # Minimal chart info (Terraform requires these)
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart      = "ingress-nginx"
 
-  values = [
-    file("${path.module}/nginx-ingress-values.yaml")
-  ]
-
+  # Tell Terraform to IGNORE everything because ingress already exists
   lifecycle {
-    # Prevent Terraform from trying to reinstall the Helm release
     ignore_changes = [
-      repository,
       chart,
+      repository,
       version,
       values,
-      set,
     ]
   }
 }
 
 ############################################
-# Discover NGINX Ingress Load Balancer
+# Discover NGINX Load Balancer
 ############################################
+
 data "aws_lb" "nginx_ingress" {
-  depends_on = [
-    helm_release.nginx_ingress
-  ]
+  depends_on = [helm_release.nginx_ingress]
 
   tags = {
     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
