@@ -1,28 +1,28 @@
 ############################################
-# NGINX Ingress via Helm
+# EKS auth for Kubernetes / Helm providers
 ############################################
 
-# Leave these providers commented if you already define helm/kubernetes
-# providers in the root module and pass them down.
+data "aws_eks_cluster_auth" "eks" {
+  name = aws_eks_cluster.eks.name
+}
 
-# provider "helm" {
-#   kubernetes = {
-#     host                   = aws_eks_cluster.eks.endpoint
-#     cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
-#     token                  = data.aws_eks_cluster_auth.eks.token
-#   }
-# }
+provider "kubernetes" {
+  host                   = aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
+}
 
-# provider "kubernetes" {
-#   host                   = aws_eks_cluster.eks.endpoint
-#   cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
-#   token                  = data.aws_eks_cluster_auth.eks.token
-# }
+provider "helm" {
+  kubernetes = {
+    host                   = aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.eks.token
+  }
+}
 
-# data "aws_eks_cluster_auth" "eks" {
-#   name = aws_eks_cluster.eks.name
-# }
-
+############################################
+# Install NGINX Ingress via Helm
+############################################
 resource "helm_release" "nginx_ingress" {
   name             = "nginx-ingress"
   repository       = "https://kubernetes.github.io/ingress-nginx"
