@@ -25,10 +25,8 @@ provider "helm" {
 }
 
 ############################################
-# NGINX Ingress (Terraform will NOT reinstall
-# after you import it)
+# Adopt Existing NGINX Ingress Release
 ############################################
-
 resource "helm_release" "nginx_ingress" {
   name             = "nginx-ingress"
   namespace        = "ingress-nginx"
@@ -42,25 +40,27 @@ resource "helm_release" "nginx_ingress" {
     file("${path.module}/nginx-ingress-values.yaml")
   ]
 
-  timeout = 600
-  wait    = true
-  atomic  = true
+  lifecycle {
+    # Prevent Terraform from trying to reinstall the Helm release
+    ignore_changes = [
+      repository,
+      chart,
+      version,
+      values,
+      set,
+    ]
+  }
 }
 
 ############################################
-# GET NGINX Load Balancer (using annotation)
+# Discover NGINX Ingress Load Balancer
 ############################################
-data "kubernetes_service" "nginx_svc" {
-  metadata {
-    name      = "ingress-nginx-controller"
-    namespace = "ingress-nginx"
-  }
-
+data "aws_lb" "nginx_ingress" {
   depends_on = [
     helm_release.nginx_ingress
   ]
-}
 
-output "nginx_ingress_load_balancer_hostname" {
-  value = data.kubernetes_service.nginx_svc.status[0].load_balancer[0].ingress[0].hostname
+  tags = {
+    "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
+  }
 }
