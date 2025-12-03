@@ -2,20 +2,24 @@
 # EKS auth for Kubernetes / Helm providers
 ############################################
 
+data "aws_eks_cluster" "eks" {
+  name = aws_eks_cluster.eks.name
+}
+
 data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.eks.name
 }
 
 provider "kubernetes" {
-  host                   = aws_eks_cluster.eks.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks.token
 }
 
 provider "helm" {
   kubernetes = {
-    host                   = aws_eks_cluster.eks.endpoint
-    cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
+    host                   = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.eks.token
   }
 }
@@ -25,27 +29,31 @@ provider "helm" {
 ############################################
 resource "helm_release" "nginx_ingress" {
   name             = "nginx-ingress"
-  repository       = "https://kubernetes.github.io/ingress-nginx"
-  chart            = "ingress-nginx"
-  version          = "4.12.0"
   namespace        = "ingress-nginx"
   create_namespace = true
 
-  values = [file("${path.module}/nginx-ingress-values.yaml")]
+  repository       = "https://kubernetes.github.io/ingress-nginx"
+  chart            = "ingress-nginx"
+  version          = "4.12.0"
 
-  depends_on = [
-    aws_eks_node_group.eks_node_group
+  values = [
+    file("${path.module}/nginx-ingress-values.yaml")
   ]
+
+  timeout    = 600
+  wait       = true
+  atomic     = true
 }
 
 ############################################
 # Discover NGINX Ingress Load Balancer
 ############################################
 data "aws_lb" "nginx_ingress" {
-  depends_on = [helm_release.nginx_ingress]
+  depends_on = [
+    helm_release.nginx_ingress
+  ]
 
   tags = {
     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
   }
 }
-
