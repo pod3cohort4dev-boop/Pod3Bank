@@ -1,11 +1,7 @@
 
 resource "aws_db_subnet_group" "mysql_subnet_group" {
   name       = "${var.environment}-mysql-subnet-group"
-<<<<<<< HEAD
   subnet_ids = var.private_subnet_ids
-=======
-  subnet_ids = module.vpc.private_subnets
->>>>>>> 08d2c1b3a80ed9ea8625f57c254a3ebd3d77b851
   tags = {
     Name        = "${var.environment}-mysql-subnet-group"
     Environment = var.environment
