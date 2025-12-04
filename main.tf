@@ -59,7 +59,6 @@ module "rds-mysql-deployment" {
   environment            = var.environment
   db_instance_class      = var.db_instance_class
   db_allocated_storage   = var.db_allocated_storage
-  private_subnet_db_ids  = module.vpc-deployment.private_subnets
   db_name                = var.db_name
   db_password            = var.db_password
   db_username            = var.db_username
