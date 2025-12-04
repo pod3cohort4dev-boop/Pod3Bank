@@ -76,8 +76,17 @@ EOF
 data "aws_lb" "nginx_ingress" {
   depends_on = [helm_release.nginx_ingress]
 
+  # No depends_on on helm_release anymore – we’re just reading
+  depends_on = [helm_release.nginx_ingress]
+
+#   tags = {
+#     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
+#   }
+# }
   tags = {
     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
   }
 }
 
+
+ 
