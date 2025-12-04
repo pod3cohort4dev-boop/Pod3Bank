@@ -38,8 +38,8 @@ variable "aws_security_group_ids" {
   description = "List of security group IDs for the database"
   type        = string
 }
-#variable "private_subnet_db_ids" {
-#  description = "List of private subnet IDs for the database"
-#  type        = list(string)
-#}
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs for the database"
+  type        = list(string)
+}
 
