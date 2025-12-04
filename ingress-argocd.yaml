@@ -11,10 +11,10 @@ spec:
   ingressClassName: external-nginx
   tls:
   - hosts:
-    - argocd.penta-ops.online
-    secretName: argocd-penta-ops.online
+    - argocd.pod3digital.online
+    secretName: argocd-pod3digital.online
   rules:
-  - host: argocd.penta-ops.online
+  - host: argocd.pod3digital.online
     http:
       paths:
       - path: /

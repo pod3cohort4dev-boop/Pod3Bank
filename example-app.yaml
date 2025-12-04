@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: penta-ops/edu:v1
+        image: pod3digital/edu:v1
         ports:
         - containerPort: 80
 ---
@@ -45,10 +45,10 @@ spec:
   ingressClassName: external-nginx
   tls:
   - hosts:
-    - app.penta-ops.online
-    secretName: app-penta-ops.online
+    - app.pod3digital.online
+    secretName: app-pod3digital.online
   rules:
-  - host: app.penta-ops.online
+  - host: app.pod3digital.online
     http:
       paths:
       - path: /

@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "penta-deployment-bucket"
-    key    = "pentaops/prod/terraform.tfstate"
+    bucket = "pod3-terraform-state"
+    key    = "terraform.tfstate"
     region = "us-east-1"
   }
 }

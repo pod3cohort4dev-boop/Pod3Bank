@@ -93,5 +93,5 @@ variable "repository_name" {
 
 }
 
-variable "domain_name" {}
-variable "email" {}
+variable "domain_name" {pod3digital.online}
+variable "email" {podcohort4dev@gmail.com}
