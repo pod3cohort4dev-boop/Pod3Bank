@@ -33,7 +33,7 @@ provider "helm" {
 }
 
 ############################################
-# IMPORTANT: Prevent Terraform from reinstalling ingress
+# IMPORTANT: Prevent Terraform from reinstalling- ingress
 ############################################
 
 resource "helm_release" "nginx_ingress" {
