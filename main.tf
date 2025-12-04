@@ -48,6 +48,7 @@ module "route53-deployment" {
   environment       = var.environment
   domain_name       = var.domain_name
   nginx_lb_hostname = module.eks-deployment.nginx_ingress_load_balancer_hostname
+
 }
 
 ##############################################
