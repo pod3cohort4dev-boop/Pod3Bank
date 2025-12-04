@@ -11,7 +11,7 @@ data "aws_eks_cluster_auth" "eks" {
 }
 
 ############################################
-# Kubernetes Provider
+# Kubernetes Providers
 ############################################
 
 provider "kubernetes" {
