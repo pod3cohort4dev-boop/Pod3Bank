@@ -33,21 +33,29 @@ provider "helm" {
 }
 
 ############################################
-# DO NOT INSTALL INGRESS AGAIN
-# (Use data source instead of helm_release)
+# Use helm_release BUT DISABLE ALL ACTIONS
 ############################################
 
-data "helm_release" "nginx_ingress" {
-  name      = "nginx-ingress"
-  namespace = "ingress-nginx"
+resource "helm_release" "nginx_ingress" {
+  name             = "nginx-ingress"
+  repository       = "https://kubernetes.github.io/ingress-nginx"
+  chart            = "ingress-nginx"
+  version          = "4.12.0"
+  namespace        = "ingress-nginx"
+  create_namespace = false
+
+  # Prevent Terraform from re-installing or modifying the release
+  lifecycle {
+    ignore_changes  = all
+    prevent_destroy = true
+  }
 }
 
 ############################################
-# Read Existing NGINX Load Balancer
+# Discover NGINX Load Balancer created earlier
 ############################################
 
 data "aws_lb" "nginx_ingress" {
-  # this tag is ALWAYS present on the ingress-nginx LB
   tags = {
     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
   }
