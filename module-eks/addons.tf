@@ -1,28 +1,20 @@
 ############################################
-# EKS data sources (auth + endpoint)
+# EKS Cluster Data
 ############################################
 
 data "aws_eks_cluster" "eks" {
-  name = aws_eks_cluster.eks.name
+  name = var.cluster_name
 }
 
 data "aws_eks_cluster_auth" "eks" {
-  name = aws_eks_cluster.eks.name
+  name = var.cluster_name
 }
-
-############################################
-# Kubernetes Provider
-############################################
 
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks.token
 }
-
-############################################
-# Helm Provider
-############################################
 
 provider "helm" {
   kubernetes = {
@@ -33,26 +25,28 @@ provider "helm" {
 }
 
 ############################################
-# IMPORTANT: Prevent Terraform from reinstalling ingress
+# nginx-ingress ALREADY INSTALLED
+# Tell Terraform: DO NOT INSTALL, DO NOT MANAGE
 ############################################
 
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   namespace = "ingress-nginx"
 
-  # Dummy values to satisfy Terraform
+  # Dummy values (Terraform needs chart info)
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
   version    = "4.12.0"
 
+  # ⭐ THIS IS THE MAGIC FIX ⭐
   lifecycle {
-    prevent_destroy = true
-    ignore_changes  = all
+    ignore_changes = all   # Ignore all updates from Terraform
+    prevent_destroy = true # Prevent Terraform from deleting it
   }
 }
 
 ############################################
-# Discover NGINX Load Balancer
+# Discover NGINX Ingress Load Balancer
 ############################################
 
 data "aws_lb" "nginx_ingress" {
