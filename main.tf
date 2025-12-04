@@ -65,4 +65,3 @@ module "rds-mysql-deployment" {
   db_username            = var.db_username
   aws_security_group_ids = module.vpc-deployment.aws_security_group_ids
 }
-
