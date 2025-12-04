@@ -38,22 +38,22 @@ provider "helm" {
 # but DO NOT allow Terraform to install or update it.
 ############################################
 
-resource "helm_release" "nginx_ingress" {
-  name      = "nginx-ingress"
-  namespace = "Ingress-nginx"
+# resource "helm_release" "nginx_ingress" {
+#   name      = "nginx-ingress"
+#   namespace = "Ingress-nginx"
 
-  chart      = "noop"
-  repository = "https://charts.helm.sh/incubator"
-  version    = "0.1.0"
+#   chart      = "noop"
+#   repository = "https://charts.helm.sh/incubator"
+#   version    = "0.1.0"
 
-  create_namespace = false
+#   create_namespace = false
 
-  lifecycle {
-    ignore_changes = all
-  }
+#   lifecycle {
+#     ignore_changes = all
+#   }
 
-  values = []
-}
+#   values = []
+# }
 
 
 
