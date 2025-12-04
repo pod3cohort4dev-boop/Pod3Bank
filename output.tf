@@ -1,5 +1,5 @@
 ############################################
-Clean Outputs for EKS Module
+# Clean Outputs for EKS Module
 ############################################
 
 output "eks_cluster_name" {
