@@ -38,7 +38,6 @@ provider "helm" {
 ############################################
 
 data "aws_lb" "nginx_ingress" {
-  # No depends_on on helm_release anymore – we’re just reading
   tags = {
     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
   }
