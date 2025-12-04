@@ -36,7 +36,6 @@ provider "helm" {
 # IMPORTANT: Prevent Terraform from reinstalling ingress
 ############################################
 
-# ✅ This is the CORRECT block (DO NOT REMOVE)
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   namespace = "ingress-nginx"
@@ -46,7 +45,6 @@ resource "helm_release" "nginx_ingress" {
   chart      = "ingress-nginx"
   version    = "4.12.0"
 
-  # 🚀 This prevents Terraform from touching the existing ingress
   lifecycle {
     prevent_destroy = true
     ignore_changes  = all
