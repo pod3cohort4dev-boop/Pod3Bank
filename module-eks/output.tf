@@ -18,16 +18,16 @@ output "cluster_certificate_authority_data" {
 }
 
 # NGINX Ingress LB Hostname
-output "nginx_ingress_load_balancer_hostname" {
-  value = data.aws_lb.nginx_ingress.dns_name
-}
+# output "nginx_ingress_load_balancer_hostname" {
+#   value = data.aws_lb.nginx_ingress.dns_name
+# }
 
-# NGINX Ingress LB DNS (optional)
-output "nginx_ingress_lb_dns" {
-  value = data.aws_lb.nginx_ingress.dns_name
-}
+# # NGINX Ingress LB DNS (optional)
+# output "nginx_ingress_lb_dns" {
+#   value = data.aws_lb.nginx_ingress.dns_name
+# }
 
-# NGINX Ingress LB IP (optional)
-output "nginx_lb_ip" {
-  value = data.aws_lb.nginx_ingress.ip_address_type == "ipv4" ? data.aws_lb.nginx_ingress.dns_name : ""
-}
+# # NGINX Ingress LB IP (optional)
+# output "nginx_lb_ip" {
+#   value = data.aws_lb.nginx_ingress.ip_address_type == "ipv4" ? data.aws_lb.nginx_ingress.dns_name : ""
+# }
