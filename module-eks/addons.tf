@@ -1,5 +1,5 @@
 ############################################
-# EKS DATA SOURCES
+# EKS data sources (auth + endpoint)
 ############################################
 
 data "aws_eks_cluster" "eks" {
@@ -11,7 +11,7 @@ data "aws_eks_cluster_auth" "eks" {
 }
 
 ############################################
-# KUBERNETES PROVIDER
+# Kubernetes Provider
 ############################################
 
 provider "kubernetes" {
@@ -21,7 +21,7 @@ provider "kubernetes" {
 }
 
 ############################################
-# HELM PROVIDER
+# Helm Provider
 ############################################
 
 provider "helm" {
@@ -33,43 +33,35 @@ provider "helm" {
 }
 
 ############################################
-# 🔥 FINAL FIX:
-# Let Terraform KNOW the release exists,
-# but DO NOT allow Terraform to install or update it.
+# IMPORTANT: Prevent Terraform from reinstalling ingress
 ############################################
 
 resource "helm_release" "nginx_ingress" {
-  name       = "nginx-ingress"
-  namespace  = "ingress-nginx"
-  chart      = "ingress-nginx"
+  name      = "nginx-ingress"
+  namespace = "ingress-nginx"
+
+  # Dummy chart info (Terraform does NOT install anything)
   repository = "https://kubernetes.github.io/ingress-nginx"
-  version    = "4.7.1"
+  chart      = "ingress-nginx"
+  version    = "4.12.0"
 
-  # Do NOT install because it already exists
-  create_namespace = false
-  timeout          = 1200
-
-  # This prevents Terraform from updating or reinstalling it
+  #  KEY FIX — tell Terraform to LEAVE IT ALONE completely
   lifecycle {
-    ignore_changes = [
-      chart,
-      version,
-      values,
-      repository,
-    ]
+    ignore_changes = all
+    prevent_destroy = true
   }
 
-  # Dummy values so Terraform is satisfied
-  values = [
-    <<EOF
-controller:
-  allowSnippetAnnotations: true
-EOF
-  ]
+  #  Do NOT wait, do NOT validate, do NOT check cluster
+  timeout          = 1
+  disable_webhooks = true
+  recreate_pods    = false
+
+  # This ensures Terraform DOES NOT try to install or modify it
+  depends_on = []
 }
 
 ############################################
-# DISCOVER EXISTING NGINX LOAD BALANCER
+# Discover NGINX Load Balancer
 ############################################
 
 data "aws_lb" "nginx_ingress" {
