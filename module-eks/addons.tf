@@ -62,3 +62,8 @@ provider "helm" {
 #     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
 #   }
 # }
+  tags = {
+    "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
+  }
+}
+ 
