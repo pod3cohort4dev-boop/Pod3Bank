@@ -1,5 +1,5 @@
 ############################################
-# EKS data sources (auth + endpoint)
+# EKS DATA SOURCES
 ############################################
 
 data "aws_eks_cluster" "eks" {
@@ -11,7 +11,7 @@ data "aws_eks_cluster_auth" "eks" {
 }
 
 ############################################
-# Kubernetes Provider
+# KUBERNETES PROVIDER
 ############################################
 
 provider "kubernetes" {
@@ -21,7 +21,7 @@ provider "kubernetes" {
 }
 
 ############################################
-# Helm Provider
+# HELM PROVIDER
 ############################################
 
 provider "helm" {
@@ -33,35 +33,42 @@ provider "helm" {
 }
 
 ############################################
-# IMPORTANT: Prevent Terraform from reinstalling ingress
+# FIXED: DO NOT RECREATE EXISTING INGRESS
 ############################################
 
 resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   namespace = "ingress-nginx"
 
-  # Dummy chart info (Terraform does NOT install anything)
+  # Dummy chart info — Terraform MUST see these fields but will ignore them
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
   version    = "4.12.0"
 
-  #  KEY FIX — tell Terraform to LEAVE IT ALONE completely
+  ########################################
+  # 🔥 THIS BLOCK FIXES THE ERROR
+  ########################################
   lifecycle {
-    ignore_changes = all
+    ignore_changes = [
+      name,
+      namespace,
+      repository,
+      chart,
+      version,
+      values,
+      set
+    ]
     prevent_destroy = true
   }
 
-  #  Do NOT wait, do NOT validate, do NOT check cluster
+  # Terraform MUST NOT attempt install/check anything
   timeout          = 1
   disable_webhooks = true
   recreate_pods    = false
-
-  # This ensures Terraform DOES NOT try to install or modify it
-  depends_on = []
 }
 
 ############################################
-# Discover NGINX Load Balancer
+# DISCOVER EXISTING NGINX LOAD BALANCER
 ############################################
 
 data "aws_lb" "nginx_ingress" {
