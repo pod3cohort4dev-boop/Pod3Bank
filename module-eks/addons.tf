@@ -42,54 +42,27 @@ resource "helm_release" "nginx_ingress" {
 
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.12.0"
+  
   create_namespace = true
-
   force_update = true
   replace      = true
   timeout      = 600
 
-  # Define set blocks properly
-  set {
-    name  = "controller.admissionWebhooks.enabled"
-    value = "false"
-  }
-
-  set {
-    name  = "controller.service.type"
-    value = "NodePort"
-  }
-
-  set {
-    name  = "controller.replicaCount"
-    value = "1"
-  }
-
-  set {
-    name  = "controller.resources.requests.cpu"
-    value = "100m"
-  }
-
-  set {
-    name  = "controller.resources.requests.memory"
-    value = "128Mi"
-  }
-
-  set {
-    name  = "controller.podSecurityContext.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "controller.containerSecurityContext.enabled"
-    value = "true"
-  }
-
-  # Remove or fix the lifecycle block
-  # lifecycle {
-  #   ignore_changes = all
-  #   prevent_destroy = true
-  # }
+  # This is a YAML string inside a list
+  values = [
+    <<-YAML
+    controller:
+      admissionWebhooks:
+        enabled: false
+      service:
+        type: NodePort
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+    YAML
+  ]
 }
 
 ############################################
