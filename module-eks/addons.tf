@@ -93,11 +93,11 @@ resource "helm_release" "cert_manager" {
   namespace  = "cert-manager"
   create_namespace = true
 
-  # Correct way: set blocks (no curly braces for the block itself)
-  set {
+  # Use equals sign and brackets (older syntax)
+  set = [{
     name  = "installCRDs"
     value = "true"
-  }
+  }]
 
   depends_on = [helm_release.nginx_ingress]
 }
