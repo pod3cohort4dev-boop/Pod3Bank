@@ -45,6 +45,10 @@ resource "helm_release" "nginx_ingress" {
   version    = "4.12.0"
   create_namespace = true
 
+  force_update = true
+
+  replace      = true
+
   lifecycle {
     ignore_changes = all
     prevent_destroy = true
