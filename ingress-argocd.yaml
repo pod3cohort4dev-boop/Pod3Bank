@@ -5,8 +5,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "external-nginx"
     cert-manager.io/cluster-issuer: http-01-production
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   ingressClassName: external-nginx
   tls:
