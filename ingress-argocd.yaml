@@ -2,11 +2,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: argocd-ingress
-  namespace: argocd
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    # REMOVE: cert-manager.io/cluster-issuer
+    kubernetes.io/ingress.class: "external-nginx"
+    cert-manager.io/cluster-issuer: http-01-production
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
+  ingressClassName: external-nginx
+  tls:
+  - hosts:
+    - argocd.pod3digital.online
+    secretName: argocd-pod3digital.online
   rules:
   - host: argocd.pod3digital.online
     http:
@@ -18,4 +24,3 @@ spec:
             name: argocd-server
             port:
               number: 80
-  # REMOVE TLS section - SSL termination happens at Load Balancer
