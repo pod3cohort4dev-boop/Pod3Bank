@@ -32,9 +32,9 @@ provider "helm" {
   }
 }
 
-############################################
+################################################
 # IMPORTANT: Prevent Terraform from reinstalling- ingress
-############################################
+################################################
 
 resource "helm_release" "nginx_ingress" {
   name      = "ingress-nginx"
@@ -46,18 +46,60 @@ resource "helm_release" "nginx_ingress" {
   create_namespace = true
 
   force_update = true
-
   replace      = true
+  
+  # INCREASE TIMEOUT SIGNIFICANTLY
+  timeout = 600  # 10 minutes, not 1 second!
 
-  lifecycle {
-    ignore_changes = all
-    prevent_destroy = true
+  # DISABLE ADMISSION WEBHOOKS (causing the secret error)
+  set {
+    name  = "controller.admissionWebhooks.enabled"
+    value = "false"
   }
 
-  timeout          = 1
-  disable_webhooks = true
-  recreate_pods    = false
+  # Use NodePort instead of LoadBalancer to avoid IAM issues
+  set {
+    name  = "controller.service.type"
+    value = "NodePort"
+  }
 
+  set {
+    name  = "controller.replicaCount"
+    value = "1"
+  }
+
+  # Minimal resource requests
+  set {
+    name  = "controller.resources.requests.cpu"
+    value = "100m"
+  }
+
+  set {
+    name  = "controller.resources.requests.memory"
+    value = "128Mi"
+  }
+
+  # Add security context
+  set {
+    name  = "controller.podSecurityContext.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "controller.containerSecurityContext.enabled"
+    value = "true"
+  }
+
+  # Optional: Remove lifecycle block or simplify it
+  # lifecycle {
+  #   ignore_changes = [chart, repository]
+  # }
+
+  depends_on = [
+    # Add any dependencies here, e.g.:
+    # module.eks.cluster_id,
+    # module.eks.cluster_endpoint
+  ]
 }
 
 ############################################
@@ -78,6 +120,3 @@ data "aws_lb" "nginx_ingress" {
     "kubernetes.io/service-name" = "ingress-nginx/ingress-nginx-controller"
   }
 }
-
-
- 
