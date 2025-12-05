@@ -47,17 +47,14 @@ resource "helm_release" "nginx_ingress" {
 
   force_update = true
   replace      = true
-  
-  # INCREASE TIMEOUT SIGNIFICANTLY
-  timeout = 600  # 10 minutes, not 1 second!
+  timeout      = 600
 
-  # DISABLE ADMISSION WEBHOOKS (causing the secret error)
+  # Define set blocks properly
   set {
     name  = "controller.admissionWebhooks.enabled"
     value = "false"
   }
 
-  # Use NodePort instead of LoadBalancer to avoid IAM issues
   set {
     name  = "controller.service.type"
     value = "NodePort"
@@ -68,7 +65,6 @@ resource "helm_release" "nginx_ingress" {
     value = "1"
   }
 
-  # Minimal resource requests
   set {
     name  = "controller.resources.requests.cpu"
     value = "100m"
@@ -79,7 +75,6 @@ resource "helm_release" "nginx_ingress" {
     value = "128Mi"
   }
 
-  # Add security context
   set {
     name  = "controller.podSecurityContext.enabled"
     value = "true"
@@ -90,16 +85,11 @@ resource "helm_release" "nginx_ingress" {
     value = "true"
   }
 
-  # Optional: Remove lifecycle block or simplify it
+  # Remove or fix the lifecycle block
   # lifecycle {
-  #   ignore_changes = [chart, repository]
+  #   ignore_changes = all
+  #   prevent_destroy = true
   # }
-
-  depends_on = [
-    # Add any dependencies here, e.g.:
-    # module.eks.cluster_id,
-    # module.eks.cluster_endpoint
-  ]
 }
 
 ############################################
