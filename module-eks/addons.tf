@@ -86,16 +86,19 @@ data "aws_lb" "nginx_ingress" {
 }
 
 resource "helm_release" "cert_manager" {
-  name             = "cert-manager"
-  repository       = "https://charts.jetstack.io"
-  chart            = "cert-manager"
-  version          = "1.14.5"
-  namespace        = "cert-manager"
+  name       = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  chart      = "cert-manager"
+  version    = "1.14.5"
+  namespace  = "cert-manager"
   create_namespace = true
+
+  # Correct way: set blocks (no curly braces for the block itself)
   set {
     name  = "installCRDs"
     value = "true"
   }
+
   depends_on = [helm_release.nginx_ingress]
 }
 #==================================================
