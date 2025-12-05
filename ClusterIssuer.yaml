@@ -1,4 +1,4 @@
-# this need to be apply first before installing certificate for any url
+# this need to be apply first before installing certificates for any url
 # =====================================================================
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
