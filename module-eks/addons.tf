@@ -48,14 +48,15 @@ resource "helm_release" "nginx_ingress" {
   replace      = true
   timeout      = 600
 
-  # This is a YAML string inside a list
   values = [
     <<-YAML
     controller:
       admissionWebhooks:
         enabled: false
       service:
-        type: NodePort
+        type: LoadBalancer  # Changed from NodePort to LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
       replicaCount: 1
       resources:
         requests:
