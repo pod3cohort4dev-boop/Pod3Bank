@@ -9,7 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: external-nginx
-  # tls:
+  tls:
   - hosts:
     - argocd.pod3digital.online
     secretName: argocd-pod3digital.online
