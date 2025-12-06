@@ -2,17 +2,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: argocd-ingress
-  namespace: argocd
   annotations:
-    kubernetes.io/ingress.class: external-nginx
+    kubernetes.io/ingress.class: "external-nginx"
     cert-manager.io/cluster-issuer: http-01-production
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: external-nginx
   tls:
   - hosts:
     - argocd.pod3digital.online
-    secretName: argocd-pod3digital.online
+    secretName: argocd-pod3digital-online
   rules:
   - host: argocd.pod3digital.online
     http:
