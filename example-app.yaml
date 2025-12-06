@@ -42,7 +42,7 @@ metadata:
     cert-manager.io/cluster-issuer: http-01-production
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
+  ingressClassName: external-nginx
   tls:
   - hosts:
     - app.pod3digital.online
